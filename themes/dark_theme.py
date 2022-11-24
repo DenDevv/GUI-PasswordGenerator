@@ -56,7 +56,7 @@ class Ui_MainWindow(object):
             QCheckBox::indicator:checked {
                 background: 3px solid rgb(61,69,84);
                 border: 3px solid rgb(74,84,103);	
-                background-image: url(images/cil-check-alt.png);
+                background-image: url(images/checkbox.png);
             }
             """
             )
@@ -86,16 +86,16 @@ class Ui_MainWindow(object):
             QCheckBox::indicator:checked {
                 background: 3px solid rgb(61,69,84);
                 border: 3px solid rgb(74,84,103);	
-                background-image: url(images/cil-check-alt.png);
+                background-image: url(images/checkbox.png);
             }
             """
             )
 
-        self.c_numbers = QtWidgets.QCheckBox(self.centralwidget)
-        self.c_numbers.setGeometry(QtCore.QRect(310, 270, 81, 20))
-        self.c_numbers.setObjectName("c_numbers")
-        self.c_numbers.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
-        self.c_numbers.setStyleSheet("""
+        self.c_digits = QtWidgets.QCheckBox(self.centralwidget)
+        self.c_digits.setGeometry(QtCore.QRect(310, 270, 81, 20))
+        self.c_digits.setObjectName("c_digits")
+        self.c_digits.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.c_digits.setStyleSheet("""
             QCheckBox {
                 color: white;
                 font-size: 13px;
@@ -116,7 +116,7 @@ class Ui_MainWindow(object):
             QCheckBox::indicator:checked {
                 background: 3px solid rgb(61,69,84);
                 border: 3px solid rgb(74,84,103);	
-                background-image: url(images/cil-check-alt.png);
+                background-image: url(images/checkbox.png);
             }
             """
             )
@@ -146,7 +146,7 @@ class Ui_MainWindow(object):
             QCheckBox::indicator:checked {
                 background: 3px solid rgb(61,69,84);
                 border: 3px solid rgb(74,84,103);	
-                background-image: url(images/cil-check-alt.png);
+                background-image: url(images/checkbox.png);
             }
             """
             )
@@ -271,7 +271,7 @@ class Ui_MainWindow(object):
         self.logo_label.setText(_translate("MainWindow", "Password Generator"))
         self.c_lower.setText(_translate("MainWindow", "Lowercase"))
         self.c_upper.setText(_translate("MainWindow", "Uppercase"))
-        self.c_numbers.setText(_translate("MainWindow", "Numbers"))
+        self.c_digits.setText(_translate("MainWindow", "digits"))
         self.c_symbols.setText(_translate("MainWindow", "Symbols"))
         self.generate_button.setText(_translate("MainWindow", "Generate"))
         self.length_label.setText(_translate("MainWindow", "Length: "))

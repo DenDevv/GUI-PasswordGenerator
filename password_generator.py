@@ -3,6 +3,13 @@ import sys
 import threading
 import secrets
 
+from functools import partial
+from string import (
+    ascii_lowercase as lower, 
+    ascii_uppercase as upper,
+    digits
+)
+
 from PyQt5 import QtWidgets, QtGui
 
 
@@ -10,11 +17,10 @@ class GUI(QtWidgets.QMainWindow):
     statuses = {
         "c_lower": True,
         "c_upper": True,
-        "c_numbers": True,
+        "c_digits": True,
         "c_symbols": True,
-        "length": 12
     }
-
+    length = 12
     clipboard = []
 
     def __init__(self, parent = None):
@@ -26,74 +32,79 @@ class GUI(QtWidgets.QMainWindow):
 
         self.ui.c_lower.setChecked(True)
         self.ui.c_upper.setChecked(True)
-        self.ui.c_numbers.setChecked(True)
+        self.ui.c_digits.setChecked(True)
         self.ui.c_symbols.setChecked(True)
 
         threading.Thread(target=self.init_UI).start()
 
     def init_UI(self):
-        self.ui.c_lower.clicked.connect(self._lower)
-        self.ui.c_upper.clicked.connect(self._upper)
-        self.ui.c_numbers.clicked.connect(self._numbers)
-        self.ui.c_symbols.clicked.connect(self._symbols)
+        self.ui.c_lower.stateChanged.connect(partial(
+            self.update_status, args=["lower", self.ui.c_lower]
+        ))
+
+        self.ui.c_upper.stateChanged.connect(partial(
+            self.update_status, args=["upper", self.ui.c_upper]
+        ))
+
+        self.ui.c_digits.stateChanged.connect(partial(
+            self.update_status, args=["digits", self.ui.c_digits]
+        ))
+
+        self.ui.c_symbols.stateChanged.connect(partial(
+            self.update_status, args=["symbols", self.ui.c_symbols]
+        ))
+        
         self.ui.generate_button.clicked.connect(self._generate)
         self.ui.copy.clicked.connect(self._clipboard)
-        
+
         self.ui.length.valueChanged[int].connect(self._length)
+
+    def update_status(self, args):
+        self.statuses["c_" + args[0]] = bool(args[1].checkState())
     
-    def _lower(self, status):
-        self.statuses["c_lower"] = status
-
-    def _upper(self, status):
-        self.statuses["c_upper"] = status
-
-    def _numbers(self, status):
-        self.statuses["c_numbers"] = status
-
-    def _symbols(self, status):
-        self.statuses["c_symbols"] = status
-
     def _length(self, num):
         self.ui.length_label_2.setText(str(num))
-        self.statuses["length"] = num
+        self.length = num
 
     def _generate(self):
-        try:
-            lower = 'abcdefghigklmnopqrstuvyxwz'
-            upper = lower.upper()
-            digits = '0123456789'
-            symbols = '~!@#$%&*_-=+,.?\/|";'
+        symbols = '~!@#$%&*_-=+,.?\/|";'
 
+        if any(self.statuses):
             password = ""
-            create_password = ""
 
-            if self.statuses.get("c_lower") == True:
-                create_password += lower
-            
-            if self.statuses.get("c_upper") == True:
-                create_password += upper
-            
-            if self.statuses.get("c_numbers") == True:
-                create_password += digits
-            
-            if self.statuses.get("c_symbols") == True:
-                create_password += symbols
+            for _ in range(self.length):
+                password += secrets.choice(
+                    self.update_strength(
+                        {
+                            "lower": lower, 
+                            "upper": upper,
+                            "digits": digits,
+                            "symbols": symbols
+                        }
+                    )
+                )
 
-            for _ in range(self.statuses.get("length")):
-                password += secrets.choice(create_password)
-
-            if any(i in digits for i in password):
-                pass
-            else:
-                password = password.replace(secrets.choice(password[secrets.randbelow(len(password))]), secrets.choice("0123456789"))
+            if not any(i in digits for i in password) and self.statuses['c_digits']:
+                password = password.replace(
+                    secrets.choice(
+                        password[secrets.randbelow(len(password))]
+                    ), 
+                    secrets.choice(digits)
+                )
 
             self.ui.copy.setText("Copy")
             self.ui.lineEdit.setText(password)
             self.clipboard.clear()
             self.clipboard.append(self.ui.lineEdit.text())
-        except:
-            pass
-        
+
+    def update_strength(self, _dict: dict):
+        create_password = ""
+
+        for k, v in _dict.items():
+            if self.statuses["c_" + k]:
+                create_password += v
+        return create_password
+
     def _clipboard(self):
         try:
             cb = QtWidgets.QApplication.clipboard()
